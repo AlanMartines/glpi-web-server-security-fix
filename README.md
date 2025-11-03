@@ -9,22 +9,40 @@ Siga os passos abaixo para ajustar corretamente a raiz do servidor web para o di
    sudo nano /etc/apache2/sites-available/glpi.conf
    ```
 
-   Altere o `DocumentRoot` e o bloco `<Directory>` para apontarem para `/var/www/html/glpi/public`:
+   Altere o `DocumentRoot` e o bloco `<Directory>` para apontarem para `/var/www/glpi/public`:
 
    ```apache
-   DocumentRoot /var/www/html/glpi/public
-   <Directory /var/www/html/glpi/public>
+   DocumentRoot /var/www/glpi/public
+   <Directory /var/www/glpi/public>
        DirectoryIndex index.html index.htm index.php index.cgi
        Options -Indexes +FollowSymLinks
        AllowOverride All
        Require all granted
    </Directory>
    ```
-
-2. **Crie o arquivo `.htaccess` no diretório `public` do GLPI:**
+   
+2.1. **Crie o arquivo `.htaccess` no diretório `glpi` do GLPI:**
 
    ```bash
-   sudo nano /var/www/html/glpi/public/.htaccess
+   sudo nano /var/www/glpi/.htaccess
+   ```
+
+   Adicione o seguinte conteúdo:
+
+   ```apache
+   <IfModule mod_rewrite.c>
+       RewriteEngine On
+       RewriteBase /
+       RewriteEngine On
+       RewriteCond %{REQUEST_URI} !^/public
+       RewriteRule ^(.*)$ public/index.php [QSA,L]
+   </IfModule>
+   ```
+
+2.2. **Crie o arquivo `.htaccess` no diretório `public` do GLPI:**
+
+   ```bash
+   sudo nano /var/www/glpi/public/.htaccess
    ```
 
    Adicione o seguinte conteúdo:
@@ -41,8 +59,8 @@ Siga os passos abaixo para ajustar corretamente a raiz do servidor web para o di
 3. **Ajuste as permissões do arquivo `.htaccess`:**
 
    ```bash
-   sudo chown www-data:www-data /var/www/html/glpi/public/.htaccess
-   sudo chmod 644 /var/www/html/glpi/public/.htaccess
+   sudo chown www-data:www-data /var/www/glpi/public/.htaccess
+   sudo chmod 644 /var/www/glpi/public/.htaccess
    ```
 
 4. **Habilite o módulo `mod_rewrite` e reinicie o Apache:**
